@@ -1,0 +1,34 @@
+apiVersion: hotswap.io/v1alpha1
+kind: HotSwapPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: hotswap-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: haze-aggregator-api
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: haze-aggregator-api
+  # hotswapProbe uses the exact schema of a container's httpGet livenessProbe;
+  # copy the target's liveness block here. Unset timing fields default to the
+  # kubelet values (periodSeconds=10, timeoutSeconds=1, successThreshold=1,
+  # failureThreshold=3, initialDelaySeconds=0).
+  hotswapProbe:
+    httpGet:
+      path: /health-check
+      port: 9999
+      scheme: HTTP
+    periodSeconds: 10
+    timeoutSeconds: 4
+    failureThreshold: 18
+  remediation:
+    strategy: Auto
+    requireStable: true
+    maxConsecutiveAttempts: 3
+    cooldownSeconds: 600
+    maxConcurrent: 1
+    systemicFailureSkipPercent: 50
+    # Set true to observe what hotswap would do (events/status/metrics) without
+    # patching the Deployment or deleting pods.
+    dryRun: false

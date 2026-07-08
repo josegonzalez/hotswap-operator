@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- hotswap_v1alpha1_hotswappolicy.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

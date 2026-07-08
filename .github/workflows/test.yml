@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  test:
+    permissions:
+      contents: read
+    name: Unit tests + coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+
+      - name: Verify modules
+        run: |
+          go mod download
+          go mod verify
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test with coverage
+        # Cover the operator logic (api/ is generated; cmd/ is manager glue).
+        run: go test -race -covermode=atomic -coverprofile=cover.out ./internal/...
+
+      - name: Enforce coverage threshold
+        run: bash hack/check-coverage.sh cover.out 85
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: coverage
+          path: cover.out
