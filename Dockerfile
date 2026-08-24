@@ -1,7 +1,7 @@
 # Build the manager binary.
 # Pin the builder to the build platform and cross-compile via GOARCH so
 # multi-arch builds don't need QEMU emulation of the build stage.
-FROM --platform=$BUILDPLATFORM golang:1.26 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.27 AS builder
 ARG TARGETOS
 ARG TARGETARCH
 
